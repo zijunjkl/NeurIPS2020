@@ -15,7 +15,12 @@ Tensorflow
 * EmotioNet (http://cbcsl.ece.ohio-state.edu/EmotionNetChallenge/index.html)
 
 ## Hyper-parameter Setting
-
+```sh
+learning rate r=0.0005
+\gamma = 0.001
+\lambda_1 = 0.005; \lambda_2 = 0.001
+Maximun number of epoch = 100
+```
 
 ## To run the code
 ```sh
