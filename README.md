@@ -19,7 +19,7 @@ Tensorflow
 
 ## To run the code
 ```sh
-python 
+python main_ThreeModel_Training.py
 ```
 
 
