@@ -18,7 +18,8 @@ Tensorflow
 ```sh
 learning rate r=0.0005
 γ = 0.001
-α_1 = 0.005; α_2 = 0.001
+λ_1 = 0.005
+λ_2 = 0.001
 Maximun number of epoch = 100
 ```
 
