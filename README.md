@@ -17,8 +17,8 @@ Tensorflow
 ## Hyper-parameter Setting
 ```sh
 learning rate r=0.0005
-\gamma = 0.001
-\lambda_1 = 0.005; \lambda_2 = 0.001
+γ = 0.001
+α_1 = 0.005; α_2 = 0.001
 Maximun number of epoch = 100
 ```
 
