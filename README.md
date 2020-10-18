@@ -1,7 +1,7 @@
 # Knowledge augmented deep models for joint facial expression and action units recogtion
 > To appear in NeurIPS 2020
 
-![](header.png)
+![](NetworkDesign-figure-v7.pdf)
 
 ## Dependencies
 
