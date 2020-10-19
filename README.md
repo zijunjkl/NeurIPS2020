@@ -1,6 +1,5 @@
 # Knowledge Augmented Deep Neural Networks for Joint Facial Expression and Action Units Recognition
-> Zijun Cui, Tengfei Song, Yuru Wang, Qiang Ji
-> To be appear in NeurIPS 2020
+> Zijun Cui, Tengfei Song, Yuru Wang, Qiang Ji (NeurIPS 2020)
 
 ![](Overview.png)
 
