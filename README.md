@@ -1,5 +1,5 @@
-# Knowledge augmented deep models for joint facial expression and action units recogtion
-> To appear in NeurIPS 2020
+# Knowledge Augmented Deep Neural Networks for Joint Facial Expression and Action Units Recognition
+> To be appear in NeurIPS 2020
 
 ![](Overview.png)
 
