@@ -29,6 +29,6 @@ python main_ThreeModel_Training.py
 ```
 
 ## Contact
-cuiz3@rpi.edu for any issue
+cuiz3@rpi.edu 
 
 
