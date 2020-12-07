@@ -1,0 +1,133 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Sun Oct 27 11:40:14 2019
+
+@author: Zijun Cui
+"""
+import tensorflow as tf
+import pdb
+
+"""  Importing and running isolated TF graph """	  
+    
+class ImportRightAU():	        
+    def __init__(self, model_path):	        
+        # Create local graph and use it in the session	        
+        self.graph = tf.Graph()	        
+        self.sess = tf.Session(graph=self.graph)	        
+        with self.graph.as_default():	            
+            # Import saved model from location 'loc' into local graph	            
+            meta_graph = tf.train.import_meta_graph(model_path + '.meta', clear_devices=True)	     	                                                                                                    
+            meta_graph.restore(self.sess, model_path)	 
+            print('Model Restored')	              
+            # FROM SAVED COLLECTION:            	            
+            self.activation = tf.get_collection('activation') #[p_AUs, pred_AUs, loss_AU_gtExpOnly, train_AU_gtExpOnly]
+
+    def run(self, image, AUprob, AUconfig):	        
+        feed = {'x_image_orig:0': image, 'keep_prob:0': 1, 'label_p_AUconfig:0': AUprob, 'list_AUconfig:0': AUconfig}
+        p_AU, pred_AU, loss = self.sess.run([self.activation[0], self.activation[1], self.activation[2]], feed_dict = feed)
+        return p_AU, pred_AU, loss
+
+    def train(self, image, AUprob, learning_rate, AUconfig):	    
+        feed = {'x_image_orig:0': image, 'keep_prob:0': 0.5, 'learning_rate:0': learning_rate, 'label_p_AUconfig:0': AUprob, 'list_AUconfig:0': AUconfig}
+        self.sess.run(self.activation, feed_dict = feed)
+        
+    def save(self, meta_path, write_model_path):
+        meta_graph = tf.train.import_meta_graph(meta_path + '.meta', clear_devices=True)
+        save_path = meta_graph.save(self.sess, write_model_path)
+        print('Model is saved in path: %s' % save_path)
+
+
+class ImportRightAU_BP4D():	        
+    def __init__(self, model_path):	        
+        # Create local graph and use it in the session	        
+        self.graph = tf.Graph()	        
+        self.sess = tf.Session(graph=self.graph)	        
+        with self.graph.as_default():	            
+            # Import saved model from location 'loc' into local graph	            
+            meta_graph = tf.train.import_meta_graph(model_path + '.meta', clear_devices=True)	     	                                                                                                    
+            meta_graph.restore(self.sess, model_path)	 
+            print('Model Restored')	              
+            # FROM SAVED COLLECTION:            	            
+            self.activation = tf.get_collection('activation') #[p_AUs, pred_AUs, loss_AU_gtExpOnly, train_AU_gtExpOnly]
+
+    def run(self, image, AUprob, AUconfig):	        
+        feed = {'x_image_orig:0': image,   'label_p_AUconfig:0': AUprob, 'list_AUconfig:0': AUconfig}
+        p_AU, pred_AU, loss = self.sess.run([self.activation[0], self.activation[1], self.activation[2]], feed_dict = feed)
+        return p_AU, pred_AU, loss
+
+    def train(self, image, AUprob, learning_rate, AUconfig):	    
+        feed = {'x_image_orig:0': image,  'learning_rate:0': learning_rate, 'label_p_AUconfig:0': AUprob, 'list_AUconfig:0': AUconfig}
+        self.sess.run(self.activation, feed_dict = feed)
+        
+    def save(self, meta_path, write_model_path):
+        meta_graph = tf.train.import_meta_graph(meta_path + '.meta', clear_devices=True)
+        save_path = meta_graph.save(self.sess, write_model_path)
+        print('Model is saved in path: %s' % save_path)
+
+
+class ImportRightExp():	    
+
+    def __init__(self, model_path):	        
+        # Create local graph and use it in the session	        
+        self.graph = tf.Graph()	        
+        self.sess = tf.Session(graph=self.graph)	        
+        with self.graph.as_default():	            
+            # Import saved model from location 'loc' into local graph	            
+            imported_graph = tf.train.import_meta_graph(model_path + '.meta', clear_devices=True)	     	                                                                                                    
+            imported_graph.restore(self.sess, model_path)	 
+            print('Model Restored')	              
+            # FROM SAVED COLLECTION:         	            
+            self.activation = tf.get_collection('activation') #[p_Exp_K, pred_Exp_K, p_Exp_3rdModel, pred_Exp_3rd, loss_3rd, train_3rd]     
+
+    def run(self, p_au, explabel, PGM_pExp):	        
+        feed = {'p_AUs_fix:0' : p_au, 'keep_prob:0': 1.0, 'label_Expression:0': explabel, 'PGM_p_Exp:0': PGM_pExp}
+        #activation 
+        p_K, pred_K, p_3rd, pred_3rd, loss = self.sess.run([self.activation[0], self.activation[1], self.activation[2], self.activation[3], self.activation[4]], feed_dict=feed)
+        return p_K, pred_K, p_3rd, pred_3rd, loss
+
+
+    def train(self, p_au, explabel, LR, PGM_pExp):
+        feed = {'p_AUs_fix:0' : p_au, 'keep_prob:0': 0.5, 'label_Expression:0': explabel, 'PGM_p_Exp:0': PGM_pExp, 'learning_rate:0':LR}
+        #activation [loss_3rd, train_3rd, pred_Exp_3rd, pred_Exp_K]
+        self.sess.run(self.activation, feed_dict=feed)
+            
+        
+    def save(self, meta_path, write_model_path):
+        meta_graph = tf.train.import_meta_graph(meta_path + '.meta', clear_devices=True)
+        save_path = meta_graph.save(self.sess, write_model_path)
+        print('Model is saved in path: %s' % save_path)
+
+
+class ImportRightExp_BP4D():	    
+
+    def __init__(self, model_path):	        
+        # Create local graph and use it in the session	        
+        self.graph = tf.Graph()	        
+        self.sess = tf.Session(graph=self.graph)	        
+        with self.graph.as_default():	            
+            # Import saved model from location 'loc' into local graph	            
+            imported_graph = tf.train.import_meta_graph(model_path + '.meta', clear_devices=True)	     	                                                                                                    
+            imported_graph.restore(self.sess, model_path)	 
+            print('Model Restored')	              
+            # FROM SAVED COLLECTION:         	            
+            self.activation = tf.get_collection('activation') #[p_Exp_K, pred_Exp_K, p_Exp_3rdModel, pred_Exp_3rd, loss_3rd, train_3rd]     
+
+    def run(self, p_au, explabel, PGM_pExp):	        
+        feed = {'p_AUs_fix:0' : p_au,   'label_Expression:0': explabel, 'PGM_p_Exp:0': PGM_pExp}
+        #activation 
+        p_K, pred_K, p_3rd, pred_3rd, loss = self.sess.run([self.activation[0], self.activation[1], self.activation[2], self.activation[3], self.activation[4]], feed_dict=feed)
+        return p_K, pred_K, p_3rd, pred_3rd, loss
+
+
+    def train(self, p_au, explabel, LR, PGM_pExp):
+        feed = {'p_AUs_fix:0' : p_au,   'label_Expression:0': explabel, 'PGM_p_Exp:0': PGM_pExp, 'learning_rate:0':LR}
+        #activation [loss_3rd, train_3rd, pred_Exp_3rd, pred_Exp_K]
+        self.sess.run(self.activation, feed_dict=feed)
+            
+        
+    def save(self, meta_path, write_model_path):
+        meta_graph = tf.train.import_meta_graph(meta_path + '.meta', clear_devices=True)
+        save_path = meta_graph.save(self.sess, write_model_path)
+        print('Model is saved in path: %s' % save_path)
+        
+        
