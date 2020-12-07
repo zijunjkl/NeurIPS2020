@@ -4,15 +4,7 @@ Created on Mon Sep 16 15:29:03 2019
 
 @author: Zijun Cui
 """
-import numpy as np
 import tensorflow as tf
-import matplotlib.image as mping
-import matplotlib.pyplot as plt
-import pickle
-import os
-from sklearn.metrics import f1_score
-from scipy.io import loadmat
-from os.path import isfile, join
 from helper_functions import weight_variable, bias_variable, conv2d, max_pool_2x2
 import pdb
 
@@ -72,6 +64,59 @@ def CNN_AUdetection(x_image,keep_prob,train_mode):
     p_AU11 = tf.nn.softmax(h_fc2[:,20:22])
     return p_AU1,p_AU2,p_AU3,p_AU4, p_AU5, p_AU6,p_AU7,p_AU8,p_AU9,p_AU10,p_AU11,h_fc2
 
+def CNN_AUdetection_ck(x_image,keep_prob,train_mode):
+    '''
+    three layer CNN for AU detection
+    input should be one patch of images containing certain AUs
+    output detection result for one AU
+    '''
+    
+    # first convolutional layer(+ activation layer)
+    W_conv1 = weight_variable("W_conv1", [5, 5, 3, 64])
+    b_conv1 = bias_variable("b_conv1", [64])
+    h_conv1 = conv2d(x_image, W_conv1, b_conv1)#(, 64, 64, 32)
+    #h_conv1 = batch_normalization(h_conv1,train_mode,'con1')
+    h_pool1 = max_pool_2x2(h_conv1) #(None, 32, 32, 32)
+    
+    #second convolutional layer(+ activation layer)
+    W_conv2 = weight_variable("W_conv2", [5, 5, 64, 64])
+    b_conv2 = bias_variable("b_conv2", [64])
+    h_conv2 = conv2d(h_pool1, W_conv2, b_conv2)#(None, 32, 32, 64)
+    #h_conv2 = batch_normalization(h_conv2,train_mode,'con2')
+    h_pool2 = max_pool_2x2(h_conv2) #(None, 16, 16, 64)
+    
+    #third convolutional layer(+ activation layer)
+    W_conv3 = weight_variable("W_conv3", [3, 3, 64, 64])
+    b_conv3 = bias_variable("b_conv3", [64])
+    h_conv3 = conv2d(h_pool2, W_conv3, b_conv3) #(None, 16, 16, 64)
+    #h_conv3 = batch_normalization(h_conv3,train_mode,'con3')
+    h_pool3 = max_pool_2x2(h_conv3) #(None, 8, 8, 64)
+    
+    #fully connected layer
+    W_fc1 = weight_variable("W_fc1", [8*8*64, 1024]) 
+    b_fc1 = bias_variable("b_fc1", [1024])
+    #reshape conv2 output to fit fully connected layer input
+    h_pool3_flat = tf.reshape(h_pool3, [-1, 8*8*64]) 
+    h_pool3_flat = tf.nn.dropout(h_pool3_flat,keep_prob)
+    h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)  
+    h_fc1 = tf.nn.dropout(h_fc1,keep_prob)
+    
+    #output layer
+    W_fc2 = weight_variable("W_fc2", [1024, 16]) 
+    b_fc2 = bias_variable("b_fc2", [16])
+    #reshape conv2 output to fit fully connected layer input
+    h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
+
+    p_AU1 = tf.nn.softmax(h_fc2[:,0:2])
+    p_AU2 = tf.nn.softmax(h_fc2[:,2:4])
+    p_AU3 = tf.nn.softmax(h_fc2[:,4:6])
+    p_AU4 = tf.nn.softmax(h_fc2[:,6:8])
+    p_AU5 = tf.nn.softmax(h_fc2[:,8:10])
+    p_AU6 = tf.nn.softmax(h_fc2[:,10:12])
+    p_AU7 = tf.nn.softmax(h_fc2[:,12:14])
+    p_AU8 = tf.nn.softmax(h_fc2[:,14:16])
+    return p_AU1,p_AU2,p_AU3,p_AU4, p_AU5, p_AU6,p_AU7,p_AU8,h_fc2
+
 
 def CNN_AUdetection_joint(x_image,keep_prob):
     '''
@@ -117,7 +162,7 @@ def CNN_AUdetection_joint(x_image,keep_prob):
     
     return p_AUs, h_fc2
 
-def CNN_AUdetection_joint_8AU(x_image,keep_prob):
+def CNN_AUdetection_joint_ck(x_image,keep_prob):
     '''
     three layer CNN for AU detection
     input should be one patch of images containing certain AUs
@@ -137,22 +182,22 @@ def CNN_AUdetection_joint_8AU(x_image,keep_prob):
     h_pool2 = max_pool_2x2(h_conv2) #(None, 16, 16, 64)
     
     #third convolutional layer(+ activation layer)
-    W_conv3 = weight_variable("W_conv3", [3, 3, 64, 128])
-    b_conv3 = bias_variable("b_conv3", [128])
+    W_conv3 = weight_variable("W_conv3", [3, 3, 64, 256])
+    b_conv3 = bias_variable("b_conv3", [256])
     h_conv3 = conv2d(h_pool2, W_conv3, b_conv3) #(None, 16, 16, 64)
     h_pool3 = max_pool_2x2(h_conv3) #(None, 8, 8, 64)
     
     #fully connected layer
-    W_fc1 = weight_variable("W_fc1", [8*8*128, 2048]) 
-    b_fc1 = bias_variable("b_fc1", [2048])
+    W_fc1 = weight_variable("W_fc1", [8*8*256, 8192]) 
+    b_fc1 = bias_variable("b_fc1", [8192])
     #reshape conv2 output to fit fully connected layer input
-    h_pool3_flat = tf.reshape(h_pool3, [-1, 8*8*128]) 
+    h_pool3_flat = tf.reshape(h_pool3, [-1, 8*8*256]) 
     
     h_fc1 = tf.nn.relu(tf.matmul(h_pool3_flat, W_fc1) + b_fc1)  
     h_fc1 = tf.nn.dropout(h_fc1,keep_prob)
     
     #output layer
-    W_fc2 = weight_variable("W_fc2", [2048, 256]) 
+    W_fc2 = weight_variable("W_fc2", [8192, 256]) 
     b_fc2 = bias_variable("b_fc2", [256])
     #reshape conv2 output to fit fully connected layer input
     h_fc2 = tf.matmul(h_fc1, W_fc2) + b_fc2
@@ -238,6 +283,34 @@ def Loss_AUModel_Labelonly(pred_au, label_au):
     loss_au_gt11 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au11, logits = pred_au[:,20:22]))
     
     loss_au_gt = loss_au_gt1 + loss_au_gt2 + loss_au_gt3 + loss_au_gt4 + loss_au_gt5 +loss_au_gt6 + loss_au_gt7 + loss_au_gt8 + loss_au_gt9 + loss_au_gt10 + loss_au_gt11
+    return loss_au_gt
+
+def Loss_AUModel_Labelonly_CK(pred_au, label_au):
+    #batch_size = tf.shape(pred_exp)[0]
+    #loss_exp_gt = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label_exp, logits = pred_exp)) 
+    
+    #depth = tf.shape(pred_au)[1]
+    one_au1 = tf.one_hot(label_au[:,0], 2)
+    one_au2 = tf.one_hot(label_au[:,1], 2)
+    one_au3 = tf.one_hot(label_au[:,2], 2)
+    one_au4 = tf.one_hot(label_au[:,3], 2)
+    one_au5 = tf.one_hot(label_au[:,4], 2)
+    one_au6 = tf.one_hot(label_au[:,5], 2)
+    one_au7 = tf.one_hot(label_au[:,6], 2)
+    one_au8 = tf.one_hot(label_au[:,7], 2)
+    
+
+    one_hot_label_au  = tf.concat([one_au1,one_au2,one_au3,one_au4,one_au5,one_au6,one_au7,one_au8],axis=1) 
+    loss_au_gt1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au1, logits = pred_au[:,0:2]))
+    loss_au_gt2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au2, logits = pred_au[:,2:4]))
+    loss_au_gt3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au3, logits = pred_au[:,4:6]))
+    loss_au_gt4 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au4, logits = pred_au[:,6:8]))
+    loss_au_gt5 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au5, logits = pred_au[:,8:10]))
+    loss_au_gt6 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au6, logits = pred_au[:,10:12]))
+    loss_au_gt7 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au7, logits = pred_au[:,12:14]))
+    loss_au_gt8 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(labels = one_au8, logits = pred_au[:,14:16]))
+    
+    loss_au_gt = loss_au_gt1 + loss_au_gt2 + loss_au_gt3 + loss_au_gt4 + loss_au_gt5 +loss_au_gt6 + loss_au_gt7 + loss_au_gt8
     return loss_au_gt
 
 
@@ -327,6 +400,7 @@ def Loss_KnowledgeModel_gtExpOnly(p_AUs, list_AUconfig, label_p_AUconfig):
     loss_AUs = loss_AU_gt
     
     return loss_AUs
+
 def normalize(x, mean, var, beta, gamma):
     inv = tf.div(gamma, tf.sqrt(tf.add(var, 0.001)))
     return tf.add(tf.multiply(tf.subtract(x,mean),inv),beta)

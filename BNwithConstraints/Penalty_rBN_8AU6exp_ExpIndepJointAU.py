@@ -224,21 +224,13 @@ ax.set_xticks([0,1,2,3,4,5,6,7,8])
 ax.set_yticks([0,1,2,3,4,5,6,7,8])
 x_label_list = ['Exp','AU1','AU2','AU4','AU6','AU7','AU12','AU15','AU17']
 y_label_list = ['Exp','AU1','AU2','AU4','AU6','AU7','AU12','AU15','AU17']
-#ax.set_xticklabels(x_label_list)
-#ax.set_yticklabels(y_label_list)
 axis_font = {'fontname':'Arial', 'size':'17'}
 plt.xticks([0,1,2,3,4,5,6,7,8], x_label_list, **axis_font)
 plt.yticks([0,1,2,3,4,5,6,7,8], y_label_list, **axis_font)
-#plt.title('Structure with EI-JAU')
 plt.gca().xaxis.tick_top()
 plt.savefig('EI-JAU-new.pdf', bbox_inches='tight',dpi=300)
 
-#plt.figure()
-#plt.imshow(weights_)
-#configs = -999*np.ones(num_nodes)
-#config = complete_config(configs, states_arr)
-#scipy.io.savemat('./ExpIndepJoint-3.mat',mdict={'adj':adj, 'weights':weights_, \
-#                                             'bias':bias_, 'prob_arr':prob_arr_,'config_list':config})
-
-#plt.figure()
-#plt.imshow(adj.T)   
+configs = -999*np.ones(num_nodes)
+config = complete_config(configs, states_arr)
+scipy.io.savemat('./ExpIndepSingle.mat',mdict={'adj':adj, 'weights':weights_, \
+                                             'bias':bias_, 'prob_arr':prob_arr_,'config_list':config})

@@ -5,25 +5,20 @@ Created on Sun Oct 27 15:48:54 2019
 @author: Zijun Cui
 """
 import tensorflow as tf
-from helper_functions import weight_variable, bias_variable, conv2d, max_pool_2x2, get_train_batch, get_valid_test_set
-from helper_functions import Compute_F1score, Compute_F1score_au
-from AU_Knowledge_part_new import CNN_AUdetection_joint, Loss_KnowledgeModel_joint, Loss_KnowledgeModel_gtExpOnly_joint
-from Update_Posterior import Exp_KnowledgeModel_joint
-from ThirdModel_part import Loss_3rdModel, Prediction_3rdModel_joint
+from AU_Knowledge_part_new import CNN_AUdetection_joint_ck, Loss_KnowledgeModel_joint, Loss_KnowledgeModel_gtExpOnly_joint
 
-import pickle
 import os
 
 im_width = 64
 im_height = 64
-AU_number = 11
-AU_config_num = 2048 # 2^5
+AU_number = 8
+AU_config_num = 256 # 2^5
 Exp_config_num = 5
 
 tf.reset_default_graph()
 
 os.environ['CUDA_DEVICE_ORDER']='PCI_BUS_ID'
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 '''  
 input
@@ -46,7 +41,7 @@ balance_w = tf.placeholder(tf.float32, name='balance_w')
 models
 '''    
 #output of AU detection model
-p_AUs, fc_AUs = CNN_AUdetection_joint(x_image, keep_prob)
+p_AUs, fc_AUs = CNN_AUdetection_joint_ck(x_image, keep_prob)
 
 #predict AU states
 pred_AU_joint = tf.math.argmax(p_AUs, axis = 1) #(None, 1)
@@ -81,6 +76,5 @@ sess.run(tf.global_variables_initializer())
 file_name = 'define_AU_p2'
 model_folder = os.path.join(os.path.join(os.getcwd()), 'Models')
 model_path = os.path.join(model_folder, file_name)
-#model_path = os.path.join('E:/Models', file_name)
 save_path = saver.save(sess, model_path)
 print('Model is saved in path: %s' % save_path)
