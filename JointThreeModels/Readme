@@ -3,14 +3,13 @@ This folder is for joint training for facial expression recognition and AU detec
 Phase 1: Initial three models: image-based FER, AU model, AU-based FER model separately
 1. Image-based FER mode
 run test_vgg19_trainable_mmi.py 
-
 Initial image-based FER model will be saved into the <Model> folder
+We provide VGG-19 without pretraining/ with pretraining in the <Model> folder. They can by downloaded by following the provided links.
 
 2. Weakly supervised AU model
 Firstly, run define_AU_model_twophase.py to define the architecture of the model
 The defined AU model will be saved to <Model> folder
-
-Then, run main_AUmodel_joint_twophase_8AU_MMI.py to train the AU model in a weakly supervised manner
+Then, run "main_AUmodel_joint_twophase_8AU_MMI.py" to train the AU model
 
 3. AU-based FER model
 Firstly, run defin_RightExpression_6exp.py to define the architecture of the model
