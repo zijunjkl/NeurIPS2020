@@ -1,0 +1,7 @@
+This folder is to learn a Bayesian Network given probability constraints derived from generic knowledge
+
+To learn a BN with all the constraints:
+run  Penalty_rBN_8AU6exp_allConstraints.py
+
+Given the learned BN, save the data in a desired format:
+run savePickle.py
