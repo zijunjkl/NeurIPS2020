@@ -6,7 +6,7 @@ run test_vgg19_trainable_mmi.py
 
 Initial image-based FER model will be saved into the <Model> folder
 
-2. Weakly supervised AU model\
+2. Weakly supervised AU model
 Firstly, run define_AU_model_twophase.py to define the architecture of the model
 The defined AU model will be saved to <Model> folder
 
