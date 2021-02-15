@@ -1,6 +1,6 @@
 This folder is for saved models
 
 For image-based FER model
-VGG-19 without pretraining: https://www.dropbox.com/s/tcm5d24dv7fz9m3/vgg19.npy?dl=0
-VGG-19 pretrained on FER2013: https://www.dropbox.com/s/cogqxsumlykg7ha/pre_trained-fer.npy?dl=0
+VGG-19 without pretraining: https://www.dropbox.com/s/49vypxkdsxljs20/vgg19.npy?dl=0
+VGG-19 pretrained on FER2013: https://www.dropbox.com/s/5tv8zvd4ziqmmli/pre_trained-fer.npy?dl=0
 
